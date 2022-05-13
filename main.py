@@ -17,7 +17,7 @@ ALL_METAS = [
 
 
 def extract_meta(video_folder, output_folder):
-    videos = [f for f in os.listdir(video_folder) if f.endswith('.MP4')]
+    videos = [f for f in os.listdir(video_folder) if f.endswith('.mp4')]
     for video in videos:
         video_path = os.path.join(video_folder, video)
         output_path = os.path.join(output_folder, video.split('.')[0])
@@ -124,8 +124,10 @@ def main():
         '--aws_secret_key', type=str,
         help='Your AWS secret key')
     args = parser.parse_args()
-    go_pro_downloader = downloader.GoProDownload(args)
-    go_pro_downloader.download_videos()
+    #go_pro_downloader = downloader.GoProDownload(args)
+    #go_pro_downloader.download_videos()
+    dropbox_downloader = downloader.DropboxDownload(args)
+    dropbox_downloader.download_videos()
     extract_meta(args.video_root, args.output_folder)
     aws_upload(
         args.output_folder, args.aws_access_key, args.aws_secret_key)

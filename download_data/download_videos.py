@@ -1,4 +1,5 @@
 import os
+import sys
 import pdb
 import ast
 import json
@@ -7,11 +8,13 @@ import zipfile
 import argparse
 import requests
 import goproplus
+import dropbox
 
 from tqdm import tqdm
 from shutil import move
 from bs4 import BeautifulSoup
-
+sys.path.append('/mnt/fs1/ziyxiang/BabyViewPublic/download_data/')
+import access_tokens as at
 
 class GoProDownload:
     def __init__(self, args):
@@ -72,19 +75,39 @@ class GoProDownload:
                             pass
             except:
                 pass
-                        
+
+
+            
+class DropboxDownload:
+    def __init__(self, args):
+        self.args = args
+        
+    def download_videos(self):
+        print('Authenticating dropbox access..')
+        dbx = dropbox.Dropbox(at.dropbox_accss_token)
+        print('Authentification finished')
+        entries = dbx.files_list_folder('//').entries
+        for entry in entries:
+            download_path = entry.path_lower            
+            vid_path = os.path.join(
+                self.args.video_root, download_path.split('/')[-1])
+            dbx.files_download_to_file(vid_path, download_path)
+        
+        
 def main():
     email = 'email'
     password = 'password'
     video_root = 'root_path'
     parser = argparse.ArgumentParser(
-        description="Download GoPro videos")
+        description="Download videos from cloud services")
     parser.add_argument('--email', type=str, default=email)
     parser.add_argument('--password', type=str, default=password)
     parser.add_argument('--video_root', type=str, default=video_root)
     args = parser.parse_args()
-    go_pro = GoProDownload(args)
-    go_pro.download_videos()
+    #go_pro = GoProDownload(args)
+    #go_pro.download_videos()
+    dropbox = DropboxDownload(args)
+    dropbox.download_videos()
     
 
 if __name__ == '__main__':
