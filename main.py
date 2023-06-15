@@ -26,12 +26,14 @@ def extract_meta(video_folder, output_folder):
         except:
             print(f'{output_folder} already exists')
             pass
-        for meta in ALL_METAS:
+    
+        for meta in ALL_METAS:            
             meta_path = os.path.join(
                 output_path, f'{meta}_meta.txt')
             print(video_path, meta_path)
             cmd = f'../gpmf-parser/gpmf-parser {video_path} -f{meta} -a | tee {meta_path}'
             os.system(cmd)
+    
         get_highlight_and_device_id(video_path, output_path)
 
         
@@ -77,7 +79,7 @@ from botocore.exceptions import NoCredentialsError
 def aws_upload(output_folder, aws_access_key, aws_secret_key):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key,
                       aws_secret_access_key=aws_secret_key)
-    bucket = 'BUCKET'
+    bucket = 'babyview01'
     current_folder = os.getcwd()
     
     for vid_folder in os.listdir(output_folder):
@@ -126,9 +128,9 @@ def main():
     args = parser.parse_args()
     #go_pro_downloader = downloader.GoProDownload(args)
     #go_pro_downloader.download_videos()
-    dropbox_downloader = downloader.DropboxDownload(args)
-    dropbox_downloader.download_videos()
-    extract_meta(args.video_root, args.output_folder)
+    #dropbox_downloader = downloader.DropboxDownload(args)
+    #dropbox_downloader.download_videos()
+    #extract_meta(args.video_root, args.output_folder)
     aws_upload(
         args.output_folder, args.aws_access_key, args.aws_secret_key)
     
