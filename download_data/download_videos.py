@@ -20,10 +20,6 @@ import requests
 #sys.path.append('/mnt/fs1/ziyxiang/BabyViewPublic/download_data/')
 
 
-# write a function to download videos from google drive
-# 1. get the video id from the google drive link
-# 2. download the video from the video id
-# 3. save the video to the video_root
 class GoogleDriveDownloader:
     def __init__(self, args):
         self.args = args
@@ -78,8 +74,8 @@ class GoogleDriveDownloader:
             
 
 def main():
-    video_root = "/data/ziyxiang/Babyview/raw_videos"
-    cred_folder = "/mnt/fs4/ziyxiang/cloud/babyview"
+    video_root = "/data/ziyxiang/BabyView/"
+    cred_folder = "/ccn2/u/ziyxiang/cloud_credentials/babyview"
     parser = argparse.ArgumentParser(
         description="Download videos from cloud services")
     parser.add_argument('--video_root', type=str, default=video_root)
