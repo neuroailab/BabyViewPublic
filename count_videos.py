@@ -27,7 +27,7 @@ class GoogleDriveDownloader:
             status, done = downloader.next_chunk()
             print("Download %d%%." % int(status.progress() * 100))        
     
-    def download_videos(self):
+    def count_videos(self):
         creds = None
         token_path = os.path.join(self.args.cred_folder, 'token.json')
         if os.path.exists(token_path):
@@ -44,25 +44,41 @@ class GoogleDriveDownloader:
             with open(token_path, 'w') as token:
                 token.write(creds.to_json())
 
-        try:
-            service = build('drive', 'v3', credentials=creds)                 
-            # Call the Drive v3 API
-            results = service.files().list(                
-                driveId=self.babyview_drive_id,
-                corpora='drive',
-                includeItemsFromAllDrives=True,
-                supportsAllDrives=True).execute()
-            items = results.get('files', [])
-            for item in items:
-                if 'mp4' in item['mimeType']:
-                    try:
-                        save_path = os.path.join(self.args.video_root, item['name'])
-                        self.download_file(service, item['id'], item['name'], save_path)
-                        print(f"saved item {item['name']} to {save_path}")
-                    except Exception as err:
-                        print(f"An error occured {err}")
-        except HttpError as err:
-            print(f"An error occured {err}")
+        # start counting videos
+        video_count = 0
+        page_token = None
+        all_mp4_files = []
+        while True:
+            try:
+                service = build('drive', 'v3', credentials=creds)
+                # Call the Drive v3 API                
+                response = service.files().list(
+                    driveId=self.babyview_drive_id,
+                    corpora='drive',
+                    pageSize=100,
+                    pageToken=page_token,
+                    orderBy='name',
+                    includeItemsFromAllDrives=True,
+                    supportsAllDrives=True,
+                    ).execute()
+                items = response.get('files', [])                
+                for item in items:
+                    if 'MP4' in item['name']:                        
+                        #print(f"video name: {item['name']}")
+                        video_count += 1
+                        all_mp4_files.append(item['name'])
+                # Check for the nextPageToken
+                page_token = response.get('nextPageToken', None)
+                if page_token is None:
+                    break            
+            except HttpError as err:
+                print(f"An error occured {err}")
+            
+            print(f"Current number of videos: {video_count}")
+        
+        print(all_mp4_files)
+        print(f"Total number of videos: {video_count}")
+
             
 
 def main():
@@ -75,7 +91,7 @@ def main():
     parser.add_argument('--port', type=int, default=8080, help='port number needs to forward from local port')
     args = parser.parse_args()
     downloader = GoogleDriveDownloader(args)
-    downloader.download_videos()
+    downloader.count_videos()
 
 
 if __name__ == '__main__':
