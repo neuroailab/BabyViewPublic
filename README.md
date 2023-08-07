@@ -1,4 +1,13 @@
-# babycam_related
+# BabyView Data Management Pipeline
+## Installation
+```
+pip install -r requirements.txt
+```
+## To count number of .MP4 videos on drive
+```
+python count_videos.py
+```
+
 ## Usage
 To use the full pipeline, you must have account information for GoPro cloud as well as AWS *access_key* and *secret_key*. 
 To get videos downloaded, compressed, metadata extracted and videos uploaded to AWS bucket.
