@@ -30,6 +30,9 @@ class GoogleDriveDownloader:
         return set()    
 
     def download_file(self, service, file_id, file_path):
+        # @TODO: some files with the exact same name will be different, can ask
+        # manual check to add a different name (-1, -2, -3)
+        # do not download already existed file..
         if os.path.exists(file_path):
             return
         print(f"Downloading to: {file_path}")
@@ -50,17 +53,6 @@ class GoogleDriveDownloader:
             with self.lock:
                 self.video_durations[file_path] = duration
                 #print(f"Video duration: {duration} seconds")
-
-    # def download_and_get_duration(self, service, file_id, file_path):
-    #     try:
-    #         self.download_file(service, file_id, file_path)
-    #     except Exception as e:
-    #         print(f">>>>>>>>>>>>>>>>>>>>>> {file_path} failed to download..")
-    #         print("Exception is", e)
-    #     try:
-    #         self.get_video_duration(file_path)
-    #     except Exception as e:
-    #         print("Exception is:", e)
 
     def download_and_get_duration(self, service, file_id, file_path, existing_paths):
         relative_path = file_path.replace(self.args.video_root, '')  # Get the relative path
